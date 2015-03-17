@@ -36,8 +36,6 @@ require(
 		brainData = datatest
 	});
 
-	// console.log('data', brainData.eSense);
-
 	$('body').append('<div id="screen"></div>');
 
     // var data = d3.range(n).map(test);
@@ -51,38 +49,38 @@ var interval = 1000;
 
 var color = d3.scale.category20();
 
-// god damnit
+// data
 var data = [
             [
-             {date:now, value: 0, id:"delta"}
+             {date:now, value: 0, id:"delta", color: "red"}
             ],
             [
-              {date:now, value: 0, id:"theta"}
+              {date:now, value: 0, id:"theta", color: "#BADA55"}
             ],
             [
-             {date:now, value: 0, id:"lowAlpha"}
+             {date:now, value: 0, id:"lowAlpha", color: "blue"}
             ],
             [
-             {date:now, value: 0, id:"highAlpha"}
+             {date:now, value: 0, id:"highAlpha", color: "green"}
             ],
             [
-             {date:now, value: 0, id:"lowBeta"}
+             {date:now, value: 0, id:"lowBeta", color: "purple"}
             ],
             [
-             {date:now, value: 0, id:"highBeta"}
+             {date:now, value: 0, id:"highBeta", color: "#BADA55"}
             ],
             [
-             {date:now, value: 0, id:"lowGamma"}
+             {date:now, value: 0, id:"lowGamma", color: "#BADA55"}
             ],
             [
-             {date:now, value: 0, id:"highGamma"}
+             {date:now, value: 0, id:"highGamma", color: "#BADA55"}
             ]
            ];
 
 
-    // [0,1,2,3,4,5,6,7].map(function(index) { 
-    //     color.domain(d3.keys(data[0]).filter(function(key) { 
-    //         return key == "id" 
+    // [0,1,2,3,4,5,6,7].map(function(index) {
+    //     color.domain(d3.keys(data[0]).filter(function(key) {
+    //         return key == "id"
     //     })
     //     )
     // })
@@ -138,7 +136,7 @@ var lines = svgBox.selectAll("g").data(data);
 var aLineContainer = lines.enter().append("g");
 aLineContainer.append("path")
     .attr("class", "line")
-    .style("stroke", function(d) { return color(d.key); });
+    // .style("stroke", function(d) { return color(d.key); });
 
 
 // add x axis to chart
@@ -149,12 +147,12 @@ svg.append("g")
 // add y axis to chart
 svg.append("g")
     .attr("class", "y axis")
-  .append("text")
+    .append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 6)
     .attr("dy", ".71em")
     .style("text-anchor", "end")
-    .text("Strenthg");
+    .text("Strength");
 
 // show scatter points and tooltips. so far its only on first point
 var formatTime = d3.time.format("%e %B");
@@ -166,17 +164,17 @@ aLineContainer.selectAll(".dot")
   .attr("class", "dot")
   .attr("r", 3.5)
   .on("mouseover", function(d) {
-            div.transition()        
-               .duration(100)      
-               .style("opacity", .9);      
-            div.html(formatTime(d.date) + "<br/>"  + d.value + "<br/>"  + d.id)  
-               .style("left", (d3.event.pageX) + "px")     
-               .style("top", (d3.event.pageY - 28) + "px");    
-            })                  
-        .on("mouseout", function(d) {       
-            div.transition()        
-                .duration(500)      
-                .style("opacity", 0);   
+            div.transition()
+               .duration(100)
+               .style("opacity", .9);
+            div.html(formatTime(d.date) + "<br/>"  + d.value + "<br/>"  + d.id)
+               .style("left", (d3.event.pageX) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
         });
 
 // transistion for paths selected
@@ -185,10 +183,8 @@ svg.append("g").attr("clip-path", "url(#clip)");
 var currentDate = now;
 function update() {
   console.log("updating");
-  
+
   currentDate = new Date(+(currentDate)+interval);
-
-
 
   if(brainData.eSense != undefined){
   var newData = [
@@ -203,24 +199,23 @@ function update() {
                 ];
             }else{
                 var newData = [
-                 {date:currentDate, value: 0, id:"delta"},
-                 {date:currentDate, value: 0, id:"theta"},
-                 {date:currentDate, value: 0, id:"lowAlpha"},
-                 {date:currentDate, value: 0, id:"highAlpha"},
-                 {date:currentDate, value: 0, id:"lowBeta"},
+                 {date:currentDate, value: 10, id:"delta"},
+                 {date:currentDate, value: 5, id:"theta"},
+                 {date:currentDate, value: 2, id:"lowAlpha"},
+                 {date:currentDate, value: 15, id:"highAlpha"},
+                 {date:currentDate, value: 20, id:"lowBeta"},
                  {date:currentDate, value: 0, id:"highBeta"},
                  {date:currentDate, value: 0, id:"lowGamma"},
                  {date:currentDate, value: 0, id:"highGamma"},
                 ];
             }
 
-                // console.log('newData', newData)
-  
+
   var lowestXDomain      = x.domain()[0];
   var highestXDomain     = x.domain()[1];
   var currentHighestDate = d3.max(data[0], function(d) { return d.date });
   var shiftRight         = false;
-  
+
   // is current highest date currently being showed?
   if (lowestXDomain <= currentHighestDate && currentHighestDate <= highestXDomain) {
     var newHighestDate = d3.max(newData, function(d) { return d.date });
@@ -230,23 +225,23 @@ function update() {
 //      svg.select("g.y.axis").transition().duration(300).ease("linear").call(yAxis);
     }
   }
-  
+
   // only perform animated transition when needed or we will have problems when dragging/zooming
   d3.transition().ease("linear").duration((shiftRight ? interval : 1)).each(function() {
 
     if (shiftRight) {
       x.domain([new Date(+(lowestXDomain)+(interval)), newHighestDate]);
     }
-    
+
     // update domains
     y.domain([0, d3.max(data.map(function(d) { return d3.max(d, function(dm) { return dm.value; }); } )) * 1.1]);
   //  xAxis.scale(x);
   //  yAxis.scale(y);
-  
+
     draw();
-  
+
   });
-  
+
   newData.forEach(function(d, i) {
     data[i].push(d);
   });
@@ -254,7 +249,7 @@ function update() {
   aLineContainer
    .attr("d", line)
    .attr("transform", null)
-  
+
   if (shiftRight) {
     aLineContainer.transition()
         .ease("linear")
@@ -274,7 +269,10 @@ function draw() {
   svg.select("g.x.axis").call(xAxis);
   svg.select("g.y.axis").transition().duration(300).ease("linear").call(yAxis);
 
-  svg.selectAll("path.line").attr("d", line);
+  var graph_lines = svg.selectAll("path.line").attr("d", line);
+
+  graph_lines.attr("stroke", function(d){return d[0].color});
+
   aLineContainer.selectAll("circle.dot").attr("cx", line.x()).attr("cy", line.y());
 //  d3.select("#footer span").text("U.S. Commercial Flights, " + x.domain().map(format).join("-"));
 }
