@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Neurosky Brain Waves Visualizer</title>
+    <title>Neurosky BrainWaves Visualizer</title>
 
     <meta name="description" content="Brain waves visualizer" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,10 +18,11 @@
 
     <link rel="stylesheet" href="test.css">
 
+
   </head>
   <body>
     <div id="screen">
-        <h1>Neurosky Brain Waves Visualizer</h1>
+        <h1>Neurosky BrainWaves Visualizer</h1>
     </div>
 	<div id="graph"></div>
 
@@ -64,7 +65,19 @@ require([], function () {
 
 });
 
+
   	</script>
+        <button id="start">Play/Pause</button>
+        <div id="caption">
+        <ul>
+            <li>Delta<span style="background-color: red"></span></li>
+            <li>Theta<span style="background-color: #BADA55"></span></li>
+            <li>LowAplha<span style="background-color: blue"></span></li>
+            <li>HiAplha<span style="background-color: green"></span></li>
+            <li>LowBeta<span style="background-color: purple"></span></li>
+            <li>All<span style="background-color: white"></span></li>
+        <ul>
+    </div>
 
   </body>
 </html>

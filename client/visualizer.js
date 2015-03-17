@@ -42,7 +42,7 @@ require(
 
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 1200 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 400 - margin.top - margin.bottom;
 
 var now = new Date;
 var interval = 1000;
@@ -74,6 +74,9 @@ var data = [
             ],
             [
              {date:now, value: 0, id:"highGamma", color: "#BADA55"}
+            ],
+            [
+             {date:now, value: 0, id:"all", color: "white"}
             ]
            ];
 
@@ -95,7 +98,7 @@ y.domain([0, 1]);
 
 var xAxis = d3.svg.axis().scale(x)
     // add ticks (axis and vertical line)
-    .tickSize(-height).tickPadding(6).ticks(5).orient("bottom");
+    .tickSize(-height).tickPadding(6).ticks(5).orient("bottom")
 
 var yAxis = d3.svg.axis().scale(y)
     // add ticks (axis and vertical line)
@@ -112,7 +115,7 @@ var zoom = d3.behavior.zoom().x(x)
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
     .call(zoom);
 
@@ -136,13 +139,11 @@ var lines = svgBox.selectAll("g").data(data);
 var aLineContainer = lines.enter().append("g");
 aLineContainer.append("path")
     .attr("class", "line")
-    // .style("stroke", function(d) { return color(d.key); });
-
 
 // add x axis to chart
 svg.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")");
+    .attr("transform", "translate(0," + height + ")")
 
 // add y axis to chart
 svg.append("g")
@@ -187,7 +188,9 @@ function update() {
   currentDate = new Date(+(currentDate)+interval);
 
   if(brainData.eSense != undefined){
-  var newData = [
+      var allValues = brainData.eegPower.delta + brainData.eegPower.theta + brainData.eegPower.lowAlpha + brainData.eegPower.highAlpha + brainData.eegPower.lowBeta
+      var all_values = allValues / 5
+      var newData = [
                  {date:currentDate, value: brainData.eegPower.delta, id:"delta"},
                  {date:currentDate, value: brainData.eegPower.theta, id:"theta"},
                  {date:currentDate, value: brainData.eegPower.lowAlpha, id:"lowAlpha"},
@@ -196,20 +199,22 @@ function update() {
                  {date:currentDate, value: brainData.eegPower.highBeta, id:"highBeta"},
                  {date:currentDate, value: brainData.eegPower.lowGamma, id:"lowGamma"},
                  {date:currentDate, value: brainData.eegPower.highGamma, id:"highGamma"},
+                 {date: currentDate, value: 0, id:"all"}
                 ];
             }else{
+              var all_values = (Math.random(1,10) + Math.random(1,10) + Math.random(1,10) + Math.random(1,10) + Math.random(1,10))/5
                 var newData = [
-                 {date:currentDate, value: 10, id:"delta"},
-                 {date:currentDate, value: 5, id:"theta"},
-                 {date:currentDate, value: 2, id:"lowAlpha"},
-                 {date:currentDate, value: 15, id:"highAlpha"},
-                 {date:currentDate, value: 20, id:"lowBeta"},
+                 {date:currentDate, value: Math.random(1,10), id:"delta"},
+                 {date:currentDate, value: Math.random(1,10), id:"theta"},
+                 {date:currentDate, value: Math.random(1,10), id:"lowAlpha"},
+                 {date:currentDate, value: Math.random(1,10), id:"highAlpha"},
+                 {date:currentDate, value: Math.random(1,10), id:"lowBeta"},
                  {date:currentDate, value: 0, id:"highBeta"},
                  {date:currentDate, value: 0, id:"lowGamma"},
                  {date:currentDate, value: 0, id:"highGamma"},
+                 {date: currentDate, value: all_values, id: "all"}
                 ];
             }
-
 
   var lowestXDomain      = x.domain()[0];
   var highestXDomain     = x.domain()[1];
@@ -258,10 +263,23 @@ function update() {
   }
 }
 
-window.setInterval(function() {
-  update();
-}, interval);
 
+    // window.setInterval(function() {
+    //   update();
+    // }, interval);
+var loading = false;
+console.log(document.getElementById("start"))
+document.getElementById("start").onclick = function(e){
+  e.preventDefault();
+  if(!loading){
+    window.setInterval(function() {
+      update();
+    }, interval);
+    loading = true
+  } else {
+    loading = false
+  }
+}
 
 draw();
 
@@ -269,14 +287,31 @@ function draw() {
   svg.select("g.x.axis").call(xAxis);
   svg.select("g.y.axis").transition().duration(300).ease("linear").call(yAxis);
 
-  var graph_lines = svg.selectAll("path.line").attr("d", line);
+  if(loading){
+      // svg.select("g.y.axis").transition().duration(0).call(yAxis);
+      // svg.select("g.x.axis").transition().duration(0);
+      d3.transition("none").duration(0)
+      var graph_lines = svg.selectAll("path.line").attr("d", line);
 
-  graph_lines.attr("stroke", function(d){return d[0].color});
+      graph_lines.attr("stroke", function(d){
+        return d[0].color
+      });
 
-  aLineContainer.selectAll("circle.dot").attr("cx", line.x()).attr("cy", line.y());
+      graph_lines.attr("stroke-width", function(d){
+        if(d[0].id === "all"){
+          width = 5 + "px"
+        } else {
+          width = 1.5 + 'px'
+        }
+        return d[0].strokeWidth = width
+      })
+
+      aLineContainer.selectAll("circle.dot").attr("cx", line.x()).attr("cy", line.y());
+
+  }
+
 //  d3.select("#footer span").text("U.S. Commercial Flights, " + x.domain().map(format).join("-"));
 }
 
-
-
 });
+
